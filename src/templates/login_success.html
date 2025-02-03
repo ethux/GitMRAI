@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Login Successful{% endblock %}
+
+{% block content %}
+<h2>Welcome back!</h2>
+<p>Your API key is: {{ api_key }}</p>
+<p>You can use this API key to authenticate your requests.</p>
+<a href="/" class="btn btn-primary">Go to Home</a>
+{% endblock %}
