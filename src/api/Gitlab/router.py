@@ -59,6 +59,24 @@ async def mr_summarize(request: Request, current_user: User = Depends(get_curren
     except Exception as e:
         logger.error(f"Error summarizing merge request: {e}")
         return {"error": str(e)}
+    
+@router.post("/mr_description")
+async def mr_description(request: Request, current_user: User = Depends(get_current_user)):
+    try:
+        body_dict = await get_request_body(request)
+        log_request(request, body_dict)
+        project_id = body_dict["project"]["id"]
+        merge_request_id = body_dict["object_attributes"]["iid"]
+        gitlab_client = GitlabService(project_id, merge_request_id)
+        diff = await gitlab_client.get_diffs()
+        logger.info(diff)
+        mistral_client = MistralLLM(diff)
+        summary = await mistral_client.summarize_description()
+        await gitlab_client.update_description(summary)
+        return summary
+    except Exception as e:
+        logger.error(f"Error summarizing merge request: {e}")
+        return {"error": str(e)}
 
 @router.post("/mr_comment_on_diff")
 async def mr_comment_on_diff(request: Request, current_user: User = Depends(get_current_user)):

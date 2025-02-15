@@ -44,6 +44,19 @@ class GitlabService:
             logger.debug(f"Comment {comment_id} edited in merge request {self.merge_request_id}")
         except Exception as e:
             logger.error(f"An error occurred: {e}")
+    
+    async def update_description(self, body):
+        try:
+            project = self.gl.projects.get(self.project_id)
+            merge_request = project.mergerequests.get(self.merge_request_id)
+
+            # Update the description of the merge request
+            merge_request.description = body
+            merge_request.save()
+
+            logger.debug(f"Description updated for merge request {self.merge_request_id}")
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
 
     async def post_comment_on_diff(self, diff_id, body, position):
         try:

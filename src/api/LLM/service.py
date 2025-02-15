@@ -31,6 +31,25 @@ class MistralLLM:
         except Exception as e:
             logger.error(f"An error occurred: {e}")
             return {"error": str(e)}
+        
+    async def summarize_description(self):
+        try:
+            with open('system_prompt_summarize.json', 'r') as file:
+                json_file = json.load(file)
+                system_prompt = json_file['system_note']
+                messages = [
+                    {"role": "system", "content": f"{system_prompt}"},
+                    {"role": "user", "content": f"{self.diffs}"}
+                ]
+                response = await self.client.chat.complete_async(
+                    model=self.model,
+                    messages=messages,
+                    temperature=0.3
+                )
+                return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            return {"error": str(e)}
     
     async def llm_comment_on_diff(self):
         try:
