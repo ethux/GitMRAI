@@ -1,15 +1,10 @@
-from fastapi import Request, APIRouter, HTTPException, status, Depends
-from supabase import Client
+from fastapi import Request, APIRouter, Depends, HTTPException, status
 import logging
 import json
 import time
 from src.config.settings import supersettings
 from src.api.LLM.service import MistralLLM
 from src.api.Gitlab.service import GitlabService
-from src.api.auth.db.database import get_db
-from src.api.auth.db.models import User
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
@@ -20,30 +15,33 @@ if not SECRET_TOKEN:
 
 BASE_PATH = "/api/v1"
 router = APIRouter(prefix=BASE_PATH)
-templates = Jinja2Templates(directory="src/templates")
-
-async def get_current_user(request: Request, db: Client = Depends(get_db)):
-    token = request.headers.get('X-Gitlab-Token')
-    if not token:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No token provided")
-    user = db.table('users').select("*").eq("api_key", token).execute()
-    user = user.data[0] if user.data else None
-    if not user:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
-    logger.info(f"User: {user}")
-    return user
 
 async def get_request_body(request: Request) -> dict:
     """Fetch and parse the request body."""
-    body = await request.body()
-    return json.loads(body)
+    try:
+        body = await request.body()
+        return json.loads(body)
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to decode JSON body: {e}")
+        raise HTTPException(status_code=422, detail="Invalid JSON body")
 
 def log_request(request: Request, body: dict):
     """Log the incoming request details."""
     logger.info(f"Request: Method={request.method}, URL={request.url}, Headers={request.headers}, Body={body}")
 
+def verify_api_key(request: Request):
+    api_key = request.headers.get("X-Gitlab-Token")
+    logger.debug(f"Received API key: {api_key}")
+    if api_key != SECRET_TOKEN:
+        logger.error("Invalid API key")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API key",
+        )
+    logger.debug("API key validated successfully")
+
 @router.post("/mr_summarize")
-async def mr_summarize(request: Request, current_user: User = Depends(get_current_user)):
+async def mr_summarize(request: Request, api_key: str = Depends(verify_api_key)):
     try:
         body_dict = await get_request_body(request)
         log_request(request, body_dict)
@@ -56,12 +54,15 @@ async def mr_summarize(request: Request, current_user: User = Depends(get_curren
         summary = await mistral_client.summarize()
         await gitlab_client.post_comment(summary)
         return summary
+    except KeyError as e:
+        logger.error(f"Missing required field in request body: {e}")
+        raise HTTPException(status_code=422, detail=f"Missing required field: {e}")
     except Exception as e:
         logger.error(f"Error summarizing merge request: {e}")
         return {"error": str(e)}
-    
+
 @router.post("/mr_description")
-async def mr_description(request: Request, current_user: User = Depends(get_current_user)):
+async def mr_description(request: Request, api_key: str = Depends(verify_api_key)):
     try:
         body_dict = await get_request_body(request)
         log_request(request, body_dict)
@@ -74,12 +75,15 @@ async def mr_description(request: Request, current_user: User = Depends(get_curr
         summary = await mistral_client.summarize_description()
         await gitlab_client.update_description(summary)
         return summary
+    except KeyError as e:
+        logger.error(f"Missing required field in request body: {e}")
+        raise HTTPException(status_code=422, detail=f"Missing required field: {e}")
     except Exception as e:
         logger.error(f"Error summarizing merge request: {e}")
         return {"error": str(e)}
 
 @router.post("/mr_comment_on_diff")
-async def mr_comment_on_diff(request: Request, current_user: User = Depends(get_current_user)):
+async def mr_comment_on_diff(request: Request, api_key: str = Depends(verify_api_key)):
     try:
         body_dict = await get_request_body(request)
         log_request(request, body_dict)
@@ -126,14 +130,9 @@ async def mr_comment_on_diff(request: Request, current_user: User = Depends(get_
 
         return {"message": "Comments posted successfully"}
 
+    except KeyError as e:
+        logger.error(f"Missing required field in request body: {e}")
+        raise HTTPException(status_code=422, detail=f"Missing required field: {e}")
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         return {"error": str(e)}
-
-@router.get("/mr_summarize", response_class=HTMLResponse)
-async def get_mr_summarize(request: Request):
-    return templates.TemplateResponse("mr_summarize.html", {"request": request})
-
-@router.get("/mr_comment_on_diff", response_class=HTMLResponse)
-async def get_mr_comment_on_diff(request: Request):
-    return templates.TemplateResponse("mr_comment_on_diff.html", {"request": request})
