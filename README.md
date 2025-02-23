@@ -1,6 +1,6 @@
 # GitMRAI 🚀
 
-GitMRAI is a Work In Progress hobby project designed to automate the creation of reviews and summaries for Gitlab Merge Requests. The goal is to replicate the features of 'Gitlab DUO' but with a completely Open Source and free-to-use approach. Note that there are still some bugs to iron out! 🐞
+GitMRAI is a Work In Progress hobby project designed to automate the creation of reviews and summaries for Gitlab Merge Requests. The goal is to replicate some of the features 'Gitlab DUO' offers, but with a completely Open Source and free-to-use approach. Note that there are still some bugs to iron out! 🐞
 
 ## ✨ Features
 
