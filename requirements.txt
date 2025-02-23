@@ -1,5 +1,2 @@
 fastapi
 mistralai
-sqlalchemy
-passlib
-supabase
