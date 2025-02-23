@@ -1,6 +1,6 @@
 # GitMRAI 🚀
 
-GitMRAI is a Work In Progress hobby project designed to automate the creation of reviews and summaries for Gitlab Merge Requests. The goal is to replicate the features of 'Gitlab DUO' but with a completely Open Source and free-to-use approach. Note that there are still some bugs to iron out! 🐞
+GitMRAI is a Work In Progress hobby project designed to automate the creation of reviews and summaries for Gitlab Merge Requests. The goal is to replicate some of the features 'Gitlab DUO' offers, but with a completely Open Source and free-to-use approach. Note that there are still some bugs to iron out! 🐞
 
 ## ✨ Features
 
@@ -94,5 +94,3 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-This README provides a clear guide for installing, setting up, and using GitMRAI. It also includes instructions for configuring Gitlab webhooks to trigger the application's endpoints.
