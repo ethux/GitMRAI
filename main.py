@@ -5,14 +5,7 @@ from fastapi.templating import Jinja2Templates
 from src.api.Gitlab.router import router as gitlab_router
 
 app = FastAPI()
-
-templates = Jinja2Templates(directory="src/templates")
-
 app.include_router(gitlab_router)
-
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("base.html", {"request": request})
 
 if __name__ == "__main__":
     import uvicorn

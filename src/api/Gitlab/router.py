@@ -7,7 +7,7 @@ from src.api.LLM.service import MistralLLM
 from src.api.Gitlab.service import GitlabService
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
 
 SECRET_TOKEN = supersettings.SECRET_TOKEN
 if not SECRET_TOKEN:
@@ -27,7 +27,7 @@ async def get_request_body(request: Request) -> dict:
 
 def log_request(request: Request, body: dict):
     """Log the incoming request details."""
-    logger.info(f"Request: Method={request.method}, URL={request.url}, Headers={request.headers}, Body={body}")
+    logger.debug(f"Request: Method={request.method}, URL={request.url}, Headers={request.headers}, Body={body}")
 
 def verify_api_key(request: Request):
     api_key = request.headers.get("X-Gitlab-Token")
@@ -49,7 +49,7 @@ async def mr_summarize(request: Request, api_key: str = Depends(verify_api_key))
         merge_request_id = body_dict["object_attributes"]["iid"]
         gitlab_client = GitlabService(project_id, merge_request_id)
         diff = await gitlab_client.get_diffs()
-        logger.info(diff)
+        logger.debug(diff)
         mistral_client = MistralLLM(diff)
         summary = await mistral_client.summarize()
         await gitlab_client.post_comment(summary)
@@ -70,7 +70,7 @@ async def mr_description(request: Request, api_key: str = Depends(verify_api_key
         merge_request_id = body_dict["object_attributes"]["iid"]
         gitlab_client = GitlabService(project_id, merge_request_id)
         diff = await gitlab_client.get_diffs()
-        logger.info(diff)
+        logger.debug(diff)
         mistral_client = MistralLLM(diff)
         summary = await mistral_client.summarize_description()
         await gitlab_client.update_description(summary)
@@ -91,7 +91,7 @@ async def mr_comment_on_diff(request: Request, api_key: str = Depends(verify_api
         merge_request_id = body_dict["object_attributes"]["iid"]
         gitlab_client = GitlabService(project_id, merge_request_id)
         diff = await gitlab_client.get_diffs()
-        logger.info(diff)
+        logger.debug(diff)
 
         max_retries = 3
         retry_delay = 2
@@ -100,7 +100,7 @@ async def mr_comment_on_diff(request: Request, api_key: str = Depends(verify_api
             try:
                 mistral_client = MistralLLM(diff)
                 comment_data_raw = await mistral_client.llm_comment_on_diff()
-                logger.info(f"Raw comment_data: {comment_data_raw}")
+                logger.debug(f"Raw comment_data: {comment_data_raw}")
                 break
             except Exception as e:
                 logger.error(f"Attempt {attempt + 1} to get comment data failed: {e}")

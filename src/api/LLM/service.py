@@ -4,7 +4,7 @@ import json
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
 
 class MistralLLM:
     def __init__(self, diffs):
@@ -68,9 +68,8 @@ class MistralLLM:
                         "type": "json_object",
                     }
                 )
-                logger.info(f"Response: {response}")
                 comment = response.choices[0].message.content
-                logger.info(f"Response content: {comment}")
+                logger.debug(f"Response content: {comment}")
                 return comment
         except Exception as e:
             logger.error(f"An error occurred: {e}")
