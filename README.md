@@ -77,6 +77,16 @@ At this moment, GitMRAI offers three endpoints that can be triggered by Gitlab w
 
 Once the webhook is set up, any push event on a Merge Request will trigger the respective endpoint, generating a summary or comment based on the changes.
 
+You can also change the prompts within the json files to adjust the summarize style or prompt to your wishes.
+
+```
+system_prompt_summarize.json
+
+OR
+
+system_prompt.json
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request with your changes.
