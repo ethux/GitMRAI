@@ -7,7 +7,6 @@ from src.api.LLM.service import MistralLLM
 from src.api.Gitlab.service import GitlabService
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
 
 SECRET_TOKEN = supersettings.SECRET_TOKEN
 if not SECRET_TOKEN:
