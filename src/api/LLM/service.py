@@ -17,7 +17,7 @@ class MistralLLM:
         try:
             with open('system_prompt_summarize.json', 'r') as file:
                 json_file = json.load(file)
-                system_prompt = json_file['system_note']
+                system_prompt = json_file['system_prompt']
                 messages = [
                     {"role": "system", "content": f"{system_prompt}"},
                     {"role": "user", "content": f"{self.diffs}"}
@@ -36,7 +36,7 @@ class MistralLLM:
         try:
             with open('system_prompt_summarize.json', 'r') as file:
                 json_file = json.load(file)
-                system_prompt = json_file['system_note']
+                system_prompt = json_file['system_prompt']
                 messages = [
                     {"role": "system", "content": f"{system_prompt}"},
                     {"role": "user", "content": f"{self.diffs}"}
@@ -55,7 +55,7 @@ class MistralLLM:
         try:
             with open('system_prompt.json', 'r') as file:
                 json_file = json.load(file)
-                system_prompt = json_file['system_note']
+                system_prompt = json_file['system_prompt']
                 messages = [
                     {"role": "system", "content": f"{system_prompt}"},
                     {"role": "user", "content": f"{self.diffs}"}
