@@ -9,8 +9,6 @@ class Settings(BaseSettings):
     GITLAB_URL: str
     GITLAB_TOKEN: str
     SECRET_TOKEN: str
-    SUPABASE_URL: str
-    SUPABASE_KEY: str
 
     class Config:
         env_file = ".env"
