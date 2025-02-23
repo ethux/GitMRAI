@@ -94,5 +94,3 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-This README provides a clear guide for installing, setting up, and using GitMRAI. It also includes instructions for configuring Gitlab webhooks to trigger the application's endpoints.
