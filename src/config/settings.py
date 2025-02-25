@@ -5,6 +5,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     MODEL: str
+    TEMPERATURE: str
     API_KEY: str
     GITLAB_URL: str
     GITLAB_TOKEN: str

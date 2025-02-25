@@ -49,8 +49,8 @@ async def mr_summarize(request: Request, api_key: str = Depends(verify_api_key))
         gitlab_client = GitlabService(project_id, merge_request_id)
         diff = await gitlab_client.get_diffs()
         logger.debug(diff)
-        mistral_client = MistralLLM(diff)
-        summary = await mistral_client.summarize()
+        mistral_client = MistralLLM(diff, system_prompt_file='system_prompt_summarize.json')
+        summary = await mistral_client.llm_msg()
         await gitlab_client.post_comment(summary)
         return summary
     except KeyError as e:
@@ -70,8 +70,8 @@ async def mr_description(request: Request, api_key: str = Depends(verify_api_key
         gitlab_client = GitlabService(project_id, merge_request_id)
         diff = await gitlab_client.get_diffs()
         logger.debug(diff)
-        mistral_client = MistralLLM(diff)
-        summary = await mistral_client.summarize_description()
+        mistral_client = MistralLLM(diff, system_prompt_file='system_prompt.json')
+        summary = await mistral_client.llm_msg()
         await gitlab_client.update_description(summary)
         return summary
     except KeyError as e:
@@ -97,8 +97,8 @@ async def mr_comment_on_diff(request: Request, api_key: str = Depends(verify_api
 
         for attempt in range(max_retries):
             try:
-                mistral_client = MistralLLM(diff)
-                comment_data_raw = await mistral_client.llm_comment_on_diff()
+                mistral_client = MistralLLM(diff, system_prompt_file='system_prompt.json')
+                comment_data_raw = await mistral_client.llm_struct()
                 logger.debug(f"Raw comment_data: {comment_data_raw}")
                 break
             except Exception as e:
@@ -113,7 +113,7 @@ async def mr_comment_on_diff(request: Request, api_key: str = Depends(verify_api
         try:
             comment_data = json.loads(comment_data_raw)
         except json.JSONDecodeError as e:
-            return {"error": "Failed to decode comment_data"}
+            return {"error": f"Failed to decode comment_data: {e}"}
 
         comments = comment_data.get('comments', [])
         for comment in comments:
