@@ -56,7 +56,7 @@ At this moment, GitMRAI offers three endpoints that can be triggered by GitLab w
 
 ### 🐳 Docker Compose
 
-To simplify the deployment process, you can use Docker Compose. This will build and run the application in a Docker container.
+You can also choose to use Docker Compose. This will build and run the application in a Docker container.
 
 #### Prerequisites
 - Docker
