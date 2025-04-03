@@ -31,7 +31,7 @@ At this moment, GitMRAI offers three endpoints that can be triggered by GitLab w
 2. **Create a virtual environment and activate it:**
    ```sh
    python3 -m venv venv
-   source venv/bin/activate # On Windows use `venv\Scripts\activate`
+   source venv/bin/activate
    ```
 
 3. **Install the required dependencies:**
