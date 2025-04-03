@@ -1,2 +1,6 @@
 fastapi
 mistralai
+uvicorn
+python-dotenv
+pydantic-settings
+python-gitlab
